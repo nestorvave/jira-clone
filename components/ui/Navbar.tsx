@@ -1,11 +1,13 @@
 import { MenuOutlined } from "@mui/icons-material";
 import { AppBar, IconButton, Toolbar, Typography } from "@mui/material";
+import { useDrawerStore } from "../../store/ui/uiStore";
 
 export const Navbar = () => {
+  const openModal = useDrawerStore ((state) => state.openDrawer);
   return (
     <AppBar position="sticky">
       <Toolbar>
-        <IconButton size="large" edge="start">
+        <IconButton size="large" edge="start" onClick={openModal}>
           <MenuOutlined />
         </IconButton>
         <Typography variant="h6">Open Jira</Typography>

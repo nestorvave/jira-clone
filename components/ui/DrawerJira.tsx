@@ -9,12 +9,19 @@ import {
   Typography,
   Divider,
 } from "@mui/material";
+import { useDrawerStore } from "../../store/ui/uiStore";
+import { shallow } from "zustand/shallow";
 
 const menuItems: string[] = ["Inbox", "Starred", "Send Email", "Drafts"];
 
 export const DrawerJira = () => {
+  const { sideMenuOpen, closeDrawer } = useDrawerStore((state: any) => ({
+    sideMenuOpen: state.sideMenuOpen,
+    closeDrawer: state.closeDrawer,
+  }));
+
   return (
-    <Drawer anchor="left" open={true} onClose={() => console.log("cerrando")}>
+    <Drawer anchor="left" open={sideMenuOpen} onClose={() => closeDrawer()}>
       <Box sx={{ width: "250px" }}></Box>
       <Box sx={{ padding: "5px 10px" }}>
         <Typography variant="h4">Menú</Typography>
