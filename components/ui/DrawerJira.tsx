@@ -15,10 +15,13 @@ import { shallow } from "zustand/shallow";
 const menuItems: string[] = ["Inbox", "Starred", "Send Email", "Drafts"];
 
 export const DrawerJira = () => {
-  const { sideMenuOpen, closeDrawer } = useDrawerStore((state: any) => ({
-    sideMenuOpen: state.sideMenuOpen,
-    closeDrawer: state.closeDrawer,
-  }));
+  const { sideMenuOpen, closeDrawer } = useDrawerStore(
+    (state: any) => ({
+      sideMenuOpen: state.sideMenuOpen,
+      closeDrawer: state.closeDrawer,
+    }),
+    shallow
+  );
 
   return (
     <Drawer anchor="left" open={sideMenuOpen} onClose={() => closeDrawer()}>
