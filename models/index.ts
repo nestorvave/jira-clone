@@ -1,1 +1,1 @@
-import { default as EntryModel } from "./Entry";
+import { default as EntryModel, type IEntry } from "./Entry";
