@@ -13,7 +13,8 @@ export default function (req: NextApiRequest, res: NextApiResponse<Data>) {
   switch (req.method) {
     case "GET":
       return getEntries(res);
-
+    case "POST":
+      return postEntry(req, res);
     default:
       return res.status(400).json({ message: "Endpoint has not found" });
   }
@@ -24,4 +25,24 @@ const getEntries = async (res: NextApiResponse<Data>) => {
   await db.disconnect();
   console.log(entries);
   res.status(200).json(entries);
+};
+const postEntry = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
+  console.log(req.body);
+  const { description = "" } = req.body;
+  if (description === "")
+    res.status(400).json({ message: "Description is required" });
+  const newEntry = new EntryModel({
+    description,
+    createdAt: Date.now(),
+  });
+  console.log(newEntry);
+  try {
+    await db.connect();
+    newEntry.save();
+    await db.disconnect();
+    return res.status(201).json(newEntry);
+  } catch (error) {
+    await db.disconnect();
+    return res.status(500).json({ message: "Server internal error" });
+  }
 };
