@@ -8,8 +8,7 @@ type Data =
   | {
       message: string;
     }
-  | IEntry
-  ;
+  | IEntry;
 
 export default function (req: NextApiRequest, res: NextApiResponse<Data>) {
   const { id } = req.query;
@@ -21,8 +20,8 @@ export default function (req: NextApiRequest, res: NextApiResponse<Data>) {
   switch (req.method) {
     case "PUT":
       return updateEntries(req, res);
-      break;
-
+    case "GET":
+      return getEntry(req, res);
     default:
       res.status(400).json({ message: "Method is not valid" });
   }
@@ -46,14 +45,32 @@ const updateEntries = async (
     description = entryToUpdate.description,
     status = entryToUpdate.status,
   } = req.body;
-  const updateEntry = await EntryModel.findByIdAndUpdate(
-    id,
-    {
-      description,
-      status,
-    },
-    { runValidators: true, new: true }
-  );
-  await db.disconnect();
-  return res.status(200).json(updateEntry);
+  try {
+    const updateEntry = await EntryModel.findByIdAndUpdate(
+      id,
+      {
+        description,
+        status,
+      },
+      { runValidators: true, new: true }
+    );
+    await db.disconnect();
+    return res.status(200).json(updateEntry!);
+  } catch (error: any) {
+    await db.disconnect();
+    return res.status(400).json({ message: error.errors.status.message });
+  }
+};
+const getEntry = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
+  await db.connect();
+  const { id } = req.query;
+  const entryInDB = await EntryModel.findById(id);
+  if (!entryInDB) {
+    await db.disconnect();
+    return res
+      .status(400)
+      .json({ message: "Entry not found with id provided" });
+  }
+
+  return res.status(200).json(entryInDB);
 };

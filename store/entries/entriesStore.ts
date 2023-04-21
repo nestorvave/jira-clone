@@ -19,13 +19,21 @@ export const useEntriesStore = create<IEntriesState>((set, get) => ({
       entries: [...state.entries, data],
     }));
   },
-  updateEntry: (payload: Entry) => {
+  updateEntry: async ({ description, _id, status }: Entry) => {
+    try {
+      const { data } = await entriesApi.put<Entry>(`/entries/${_id}`, {
+        description,
+        status,
+      });
+    } catch (error) {
+      console.log(error);
+    }
     set((state) => ({
       ...state,
       entries: state.entries.map((entry) => {
-        if (entry._id === payload._id) {
-          entry.status = payload.status;
-          entry.description = payload.description;
+        if (entry._id === _id) {
+          entry.status = status;
+          entry.description = description;
         }
         return entry;
       }),
