@@ -23,11 +23,9 @@ const getEntries = async (res: NextApiResponse<Data>) => {
   await db.connect();
   const entries = await EntryModel.find().sort({ createdAt: "ascending" });
   await db.disconnect();
-  console.log(entries);
   res.status(200).json(entries);
 };
 const postEntry = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
-  console.log(req.body);
   const { description = "" } = req.body;
   if (description === "")
     res.status(400).json({ message: "Description is required" });
@@ -35,7 +33,6 @@ const postEntry = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
     description,
     createdAt: Date.now(),
   });
-  console.log(newEntry);
   try {
     await db.connect();
     newEntry.save();
