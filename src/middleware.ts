@@ -13,7 +13,6 @@ export function middleware(req: NextRequest) {
       url.search = `?message=${id} is not a valid mongo id`;
       return NextResponse.rewrite(url);
     }
-    console.log(id);
   }
   return NextResponse.next();
 }
