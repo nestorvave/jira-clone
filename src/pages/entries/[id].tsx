@@ -23,6 +23,7 @@ import { isValidObjectId } from "mongoose";
 import { dbEntries } from "../../../database";
 import { Entry } from "../../../interfaces/entry";
 import { useEntriesStore } from "../../../store/entries/entriesStore";
+import { useSnackbar } from "notistack";
 
 const validStatus: EntryStatus[] = ["pending", "in-progress", "finished"];
 
@@ -36,6 +37,9 @@ export const EntryPage: FC<Props> = ({ entry }) => {
   const [currentStatus, setCurrentStatus] = useState<EntryStatus>(status);
   const [touched, setTouched] = useState<boolean>(false);
 
+  const { enqueueSnackbar } = useSnackbar();
+  const { updateEntry } = useEntriesStore();
+
   const onTextChange = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
   };
@@ -44,20 +48,39 @@ export const EntryPage: FC<Props> = ({ entry }) => {
     setCurrentStatus(event.target.value as EntryStatus);
   };
 
-  const onSave = () => {
-    if (inputValue.trim().length === 0) return 0;
-    const updatedEntry: Entry = {
-      ...entry,
-      status,
-      description: inputValue,
-    };
-    updateEntry(updatedEntry);
+  const onSave = async () => {
+    try {
+      if (inputValue.trim().length === 0) return 0;
+      const updatedEntry: Entry = {
+        ...entry,
+        status: currentStatus,
+        description: inputValue,
+      };
+      await updateEntry(updatedEntry);
+      enqueueSnackbar("Entry updated", {
+        variant: "success",
+        autoHideDuration: 1500,
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+      });
+    } catch (error) {
+      enqueueSnackbar("An error ocurred", {
+        variant: "error",
+        autoHideDuration: 1500,
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+      });
+    }
   };
+
   const isNotValidForm = useMemo(
     () => inputValue.length === 0 && touched,
     [inputValue, touched]
   );
-  const { updateEntry } = useEntriesStore();
 
   return (
     <Layout title={inputValue.substring(0, 20) + "..."}>

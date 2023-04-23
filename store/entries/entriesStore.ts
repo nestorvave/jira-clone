@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { entriesApi } from "../../apis";
 
+
 interface IEntriesState {
   entries: Entry[];
   addEntry: (description: string) => void;
@@ -25,19 +26,19 @@ export const useEntriesStore = create<IEntriesState>((set, get) => ({
         description,
         status,
       });
+      set((state) => ({
+        ...state,
+        entries: state.entries.map((entry) => {
+          if (entry._id === _id) {
+            entry.status = status;
+            entry.description = description;
+          }
+          return entry;
+        }),
+      }));
     } catch (error) {
-      console.log(error);
+      throw new Error('Error updating entry');
     }
-    set((state) => ({
-      ...state,
-      entries: state.entries.map((entry) => {
-        if (entry._id === _id) {
-          entry.status = status;
-          entry.description = description;
-        }
-        return entry;
-      }),
-    }));
   },
   initializeEntries: async () => {
     try {
