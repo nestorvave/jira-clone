@@ -17,11 +17,14 @@ export default function (req: NextApiRequest, res: NextApiResponse<Data>) {
     return res.status(400).json({ message: "ID is not valid" });
   }
 
+  console.log(req.method);
   switch (req.method) {
     case "PUT":
       return updateEntries(req, res);
     case "GET":
       return getEntry(req, res);
+    case "DELETE":
+      return deleteEntry(req, res);
     default:
       res.status(400).json({ message: "Method is not valid" });
   }
@@ -73,4 +76,21 @@ const getEntry = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
   }
 
   return res.status(200).json(entryInDB);
+};
+const deleteEntry = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
+  const { id } = req.query;
+  try {
+    await db.connect();
+    const deletedEntry = await EntryModel.findByIdAndRemove(id);
+    await db.disconnect();
+
+    if (!deletedEntry) {
+      return res.status(404).json({ message: "Entry not found" });
+    }
+
+    return res.status(200).json({ message: "Entry deleted successfully" });
+  } catch (error) {
+    await db.disconnect();
+    return res.status(500).json({ message: "Server internal error" });
+  }
 };

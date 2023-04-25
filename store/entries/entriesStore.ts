@@ -4,12 +4,12 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { entriesApi } from "../../apis";
 
-
 interface IEntriesState {
   entries: Entry[];
   addEntry: (description: string) => void;
   updateEntry: (payload: Entry) => void;
   initializeEntries: () => Promise<void>;
+  deleteEntry: (payload: Entry) => Promise<void>;
 }
 
 export const useEntriesStore = create<IEntriesState>((set, get) => ({
@@ -37,7 +37,7 @@ export const useEntriesStore = create<IEntriesState>((set, get) => ({
         }),
       }));
     } catch (error) {
-      throw new Error('Error updating entry');
+      throw new Error("Error updating entry");
     }
   },
   initializeEntries: async () => {
@@ -46,6 +46,19 @@ export const useEntriesStore = create<IEntriesState>((set, get) => ({
       set((state) => ({ entries: data }));
     } catch (error) {
       console.error(error);
+    }
+  },
+  deleteEntry: async ({ _id }: Entry) => {
+    try {
+      const { data } = await entriesApi.delete<Entry>(`/entries/${_id}`);
+      set((state) => ({
+        ...state,
+        entries: state.entries.filter((entry) => {
+          return entry._id !== _id;
+        }),
+      }));
+    } catch (error) {
+      throw new Error("Error updating entry");
     }
   },
 }));

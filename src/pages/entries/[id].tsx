@@ -24,6 +24,8 @@ import { dbEntries } from "../../../database";
 import { Entry } from "../../../interfaces/entry";
 import { useEntriesStore } from "../../../store/entries/entriesStore";
 import { useSnackbar } from "notistack";
+import { dateFunctions } from "../../../utils";
+import { useRouter } from "next/router";
 
 const validStatus: EntryStatus[] = ["pending", "in-progress", "finished"];
 
@@ -36,9 +38,10 @@ export const EntryPage: FC<Props> = ({ entry }) => {
   const [inputValue, setInputValue] = useState(description);
   const [currentStatus, setCurrentStatus] = useState<EntryStatus>(status);
   const [touched, setTouched] = useState<boolean>(false);
+  const router = useRouter();
 
   const { enqueueSnackbar } = useSnackbar();
-  const { updateEntry } = useEntriesStore();
+  const { updateEntry, deleteEntry } = useEntriesStore();
 
   const onTextChange = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
@@ -65,6 +68,7 @@ export const EntryPage: FC<Props> = ({ entry }) => {
           horizontal: "right",
         },
       });
+      router.back();
     } catch (error) {
       enqueueSnackbar("An error ocurred", {
         variant: "error",
@@ -89,7 +93,9 @@ export const EntryPage: FC<Props> = ({ entry }) => {
           <Card>
             <CardHeader
               title={`Entry: ${inputValue}`}
-              subheader={`Created ${createdAt}  ... ago`}
+              subheader={`Created ${dateFunctions.getFormatDistanceToNow(
+                createdAt
+              )} ago`}
             />
             <CardContent>
               <TextField
@@ -143,6 +149,18 @@ export const EntryPage: FC<Props> = ({ entry }) => {
           bottom: 30,
           right: 30,
           backgroundColor: "error.dark",
+        }}
+        onClick={() => {
+          deleteEntry(entry);
+          enqueueSnackbar("Entry deleted", {
+            variant: "success",
+            autoHideDuration: 1500,
+            anchorOrigin: {
+              vertical: "top",
+              horizontal: "right",
+            },
+          });
+          router.back();
         }}
       >
         <Delete />

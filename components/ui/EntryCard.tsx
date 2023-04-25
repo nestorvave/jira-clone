@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 import React, { DragEvent, FC } from "react";
 import { Entry } from "../../interfaces";
 import { useDrawerStore } from "../../store/ui/uiStore";
+import { dateFunctions } from "../../utils";
 
 interface IEntryCard {
   entry: Entry;
@@ -29,6 +30,7 @@ export const EntryCard: FC<IEntryCard> = ({ entry }) => {
   const onRedirect = () => {
     router.push(`/entries/${entry._id}`);
   };
+
   return (
     <Card
       sx={{ marginBottom: 1 }}
@@ -46,7 +48,10 @@ export const EntryCard: FC<IEntryCard> = ({ entry }) => {
         <CardActions
           sx={{ display: "flex", justifyContent: "end", paddingRight: 2 }}
         >
-          <Typography variant="body2">Hace 30 min</Typography>
+          <Typography variant="body2">
+            {" "}
+            {dateFunctions.getFormatDistanceToNow(entry.createdAt)} ago
+          </Typography>
         </CardActions>
       </CardActionArea>
     </Card>
